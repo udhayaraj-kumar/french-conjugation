@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conjugaison — French Verb Master</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F0E0C;
+    --surface: #1A1916;
+    --surface2: #252320;
+    --border: #2E2C28;
+    --text: #F0EDE6;
+    --muted: #7A7670;
+    --accent: #C9A84C;
+    --accent2: #E8C97E;
+    --green: #5DB887;
+    --red: #E06B6B;
+    --blue: #6BA3E0;
+    --purple: #A87BE0;
+    --orange: #E09B5C;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* === LAYOUT === */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* === SIDEBAR === */
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .logo-fr {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .logo-en {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .sidebar-subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* Search */
+  .search-wrap { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+
+  .search-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px 9px 34px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  .search-wrap { position: relative; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .search-icon { position: absolute; left: 28px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; pointer-events: none; }
+
+  /* Filter tabs */
+  .filter-tabs { display: flex; gap: 4px; padding: 10px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+
+  .filter-tab {
+    padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-size: 11px; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.5px; transition: all 0.15s;
+  }
+
+  .filter-tab.active { background: var(--accent); border-color: var(--accent); color: #000; }
+  .filter-tab:hover:not(.active) { border-color: var(--muted); color: var(--text); }
+
+  /* Verb list */
+  .verb-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .verb-list::-webkit-scrollbar { width: 4px; }
+  .verb-list::-webkit-scrollbar-track { background: transparent; }
+  .verb-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .verb-group-label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); padding: 10px 16px 4px; font-weight: 600;
+  }
+
+  .verb-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; cursor: pointer; transition: background 0.12s;
+    border-left: 2px solid transparent;
+  }
+
+  .verb-item:hover { background: var(--surface2); }
+  .verb-item.active { background: var(--surface2); border-left-color: var(--accent); }
+
+  .verb-item-left { display: flex; flex-direction: column; gap: 2px; }
+  .verb-item-name { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--text); }
+  .verb-item-meaning { font-size: 11px; color: var(--muted); }
+
+  .verb-type-badge {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 4px;
+  }
+
+  .badge-er { background: #5DB88722; color: var(--green); }
+  .badge-ir { background: #6BA3E022; color: var(--blue); }
+  .badge-re { background: #A87BE022; color: var(--purple); }
+  .badge-irr { background: #E09B5C22; color: var(--orange); }
+  .badge-custom { background: #C9A84C22; color: var(--accent); }
+
+  /* Add verb */
+  .add-verb-btn {
+    margin: 8px 16px 12px; padding: 10px; border-radius: 8px;
+    border: 1px dashed var(--border); background: transparent; color: var(--muted);
+    font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer;
+    width: calc(100% - 32px); transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  .add-verb-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* === MAIN === */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* Top bar */
+  .topbar {
+    padding: 20px 36px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface);
+  }
+
+  .verb-title-block { display: flex; align-items: baseline; gap: 16px; }
+
+  .verb-hero {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px; font-weight: 900; color: var(--text); line-height: 1;
+  }
+
+  .verb-meaning-top { font-size: 15px; color: var(--muted); font-style: italic; }
+
+  .mode-tabs { display: flex; gap: 2px; background: var(--surface2); border-radius: 10px; padding: 3px; }
+
+  .mode-tab {
+    padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    background: transparent; color: var(--muted); transition: all 0.15s;
+  }
+
+  .mode-tab.active { background: var(--accent); color: #000; font-weight: 600; }
+  .mode-tab:hover:not(.active) { color: var(--text); }
+
+  /* Tense selector */
+  .tense-bar {
+    display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    overflow-x: auto; padding: 0 36px; background: var(--surface);
+  }
+
+  .tense-bar::-webkit-scrollbar { display: none; }
+
+  .tense-btn {
+    padding: 14px 20px; border: none; border-bottom: 2px solid transparent;
+    background: transparent; color: var(--muted); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.5px; cursor: pointer; white-space: nowrap;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+
+  .tense-btn:hover { color: var(--text); }
+  .tense-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* Content */
+  .content { flex: 1; overflow-y: auto; padding: 36px; }
+  .content::-webkit-scrollbar { width: 6px; }
+  .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* === TABLE VIEW === */
+  .conj-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; max-width: 800px;
+  }
+
+  .conj-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+    transition: border-color 0.15s, transform 0.15s;
+    animation: slideIn 0.3s ease both;
+  }
+
+  .conj-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .conj-card:nth-child(1) { animation-delay: 0.03s; }
+  .conj-card:nth-child(2) { animation-delay: 0.06s; }
+  .conj-card:nth-child(3) { animation-delay: 0.09s; }
+  .conj-card:nth-child(4) { animation-delay: 0.12s; }
+  .conj-card:nth-child(5) { animation-delay: 0.15s; }
+  .conj-card:nth-child(6) { animation-delay: 0.18s; }
+
+  .conj-pronoun { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .conj-form { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--text); }
+
+  /* All tenses view */
+  .all-tenses-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+  }
+
+  .tense-block {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; animation: slideIn 0.3s ease both;
+  }
+
+  .tense-block-header {
+    padding: 12px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .tense-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .tense-block-title { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; color: var(--text); }
+
+  .tense-block-rows { }
+  .tense-block-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 18px; border-bottom: 1px solid var(--border);
+  }
+  .tense-block-row:last-child { border-bottom: none; }
+  .tbr-pronoun { font-size: 12px; color: var(--muted); }
+  .tbr-form { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text); }
+
+  /* === FLASHCARD === */
+  .flashcard-wrap { display: flex; flex-direction: column; align-items: center; gap: 28px; max-width: 600px; margin: 0 auto; }
+
+  .progress-bar-wrap { width: 100%; }
+  .progress-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .progress-bar-track { height: 3px; background: var(--surface2); border-radius: 2px; }
+  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
+
+  .flashcard {
+    width: 100%; height: 280px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surface);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
+  }
+
+  .flashcard:hover { border-color: var(--accent); }
+  .flashcard.flipped { background: var(--surface2); border-color: var(--accent); }
+
+  .flashcard::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 30%, var(--accent)08, transparent 60%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+
+  .flashcard.flipped::before { opacity: 1; }
+
+  .fc-hint { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .fc-pronoun { font-size: 15px; color: var(--muted); margin-bottom: 6px; }
+  .fc-main { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; color: var(--text); line-height: 1; }
+  .fc-tense { font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+  .fc-nav { display: flex; gap: 12px; width: 100%; }
+
+  .fc-btn {
+    flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-size: 18px;
+    cursor: pointer; transition: all 0.15s;
+  }
+
+  .fc-btn:hover { background: var(--surface2); border-color: var(--muted); }
+  .fc-btn.primary { background: var(--accent); border-color: var(--accent); color: #000; font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+  .fc-btn.primary:hover { background: var(--accent2); }
+
+  .fc-dots { display: flex; gap: 6px; }
+  .fc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; transition: all 0.2s; }
+  .fc-dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+
+  /* === QUIZ === */
+  .quiz-wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .quiz-score-bar {
+    display: flex; gap: 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 20px; align-items: center;
+  }
+
+  .score-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .score-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
+  .score-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .score-divider { width: 1px; height: 36px; background: var(--border); margin: 0 4px; }
+
+  .quiz-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+    padding: 28px;
+  }
+
+  .quiz-meta { display: flex; gap: 8px; margin-bottom: 20px; }
+  .quiz-badge {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.5px; padding: 4px 10px;
+    border-radius: 6px; text-transform: uppercase;
+  }
+
+  .quiz-prompt { margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+  .quiz-question { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; }
+  .quiz-pronoun { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: var(--text); }
+  .quiz-verb-q { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--accent); }
+  .quiz-sub { font-size: 12px; color: var(--muted); }
+
+  .quiz-input {
+    width: 100%; background: var(--surface2); border: 2px solid var(--border);
+    border-radius: 12px; padding: 16px 18px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 400;
+    outline: none; transition: border-color 0.2s; margin-top: 20px;
+  }
+
+  .quiz-input:focus { border-color: var(--accent); }
+  .quiz-input.correct { border-color: var(--green); background: #5DB88710; }
+  .quiz-input.wrong { border-color: var(--red); background: #E06B6B10; }
+
+  .quiz-feedback {
+    border-radius: 12px; padding: 14px 18px; margin-top: 12px;
+    font-size: 14px; display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #5DB88715; border: 1px solid #5DB88730; color: var(--green); }
+  .quiz-feedback.wrong { background: #E06B6B15; border: 1px solid #E06B6B30; color: var(--red); }
+
+  .quiz-actions { display: flex; gap: 10px; margin-top: 16px; }
+
+  .btn-primary {
+    flex: 1; padding: 14px; border-radius: 12px; border: none;
+    background: var(--accent); color: #000; font-size: 14px; font-weight: 700;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-secondary {
+    padding: 14px 20px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-size: 14px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--muted); }
+
+  /* === MODAL === */
+  .modal-overlay {
+    position: fixed; inset: 0; background: #000000bb; z-index: 1000;
+    display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 32px; width: 520px; max-width: 95vw;
+    animation: modalIn 0.25s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .modal-field { margin-bottom: 16px; }
+  .modal-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
+
+  .modal-input, .modal-select {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+    transition: border-color 0.2s; appearance: none;
+  }
+  .modal-input:focus, .modal-select:focus { border-color: var(--accent); }
+
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .modal-grid .modal-input { font-family: 'DM Mono', monospace; font-size: 13px; }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+
+  .verb-count-badge {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 2px 8px; font-size: 11px; color: var(--muted);
+    font-family: 'DM Mono', monospace; margin-left: auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-fr">Conjugaison</span>
+        <span class="logo-en">FR</span>
+      </div>
+      <div class="sidebar-subtitle">French Verb Master · TEF B2</div>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" placeholder="Search verbs..." oninput="filterVerbs()" style="padding-left: 34px;">
+    </div>
+
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-tab" onclick="setFilter('-ER', this)">-ER</button>
+      <button class="filter-tab" onclick="setFilter('-IR', this)">-IR</button>
+      <button class="filter-tab" onclick="setFilter('-RE', this)">-RE</button>
+      <button class="filter-tab" onclick="setFilter('irregular', this)">Irreg.</button>
+      <button class="filter-tab" onclick="setFilter('custom', this)">Custom</button>
+    </div>
+
+    <div class="verb-list" id="verbList"></div>
+    <button class="add-verb-btn" onclick="openModal()">＋ Add custom verb</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="verb-title-block">
+        <div class="verb-hero" id="heroVerb">parler</div>
+        <div class="verb-meaning-top" id="heroMeaning">to speak</div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;">
+        <span class="verb-count-badge" id="verbCountBadge">30 verbs</span>
+        <span style="background:#5DB88715;border:1px solid #5DB88730;border-radius:6px;padding:2px 9px;font-size:11px;color:#5DB887;font-weight:600;">✓ Verified</span>
+        <div class="mode-tabs">
+          <button class="mode-tab active" onclick="setMode('table', this)">Table</button>
+          <button class="mode-tab" onclick="setMode('all', this)">All Tenses</button>
+          <button class="mode-tab" onclick="setMode('flash', this)">Flashcard</button>
+          <button class="mode-tab" onclick="setMode('quiz', this)">Quiz</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tense-bar" id="tenseBar"></div>
+
+    <div class="content" id="contentArea"></div>
+  </div>
+</div>
+
+<!-- ADD VERB MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">Add Custom Verb</div>
+    <div class="modal-sub">Add any French verb to your personal list</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="modal-field">
+        <label class="modal-label">Infinitive</label>
+        <input class="modal-input" id="mInfinitive" placeholder="e.g. manger">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Meaning</label>
+        <input class="modal-input" id="mMeaning" placeholder="to eat">
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">Type</label>
+      <select class="modal-select" id="mType">
+        <option value="regular -ER">Regular -ER</option>
+        <option value="regular -IR">Regular -IR</option>
+        <option value="regular -RE">Regular -RE</option>
+        <option value="irregular">Irregular</option>
+      </select>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label" style="margin-bottom:10px;">Présent (je, tu, il, nous, vous, ils)</label>
+      <div class="modal-grid">
+        <input class="modal-input" id="p0" placeholder="je ...">
+        <input class="modal-input" id="p1" placeholder="tu ...">
+        <input class="modal-input" id="p2" placeholder="il/elle ...">
+        <input class="modal-input" id="p3" placeholder="nous ...">
+        <input class="modal-input" id="p4" placeholder="vous ...">
+        <input class="modal-input" id="p5" placeholder="ils/elles ...">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="addCustomVerb()">Add Verb</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRONOUNS = ["je", "tu", "il/elle", "nous", "vous", "ils/elles"];
+
+const TENSES = [
+  { key: "présent", label: "Présent", color: "#5DB887" },
+  { key: "passé_composé", label: "Passé Composé", color: "#E09B5C" },
+  { key: "imparfait", label: "Imparfait", color: "#6BA3E0" },
+  { key: "futur", label: "Futur Simple", color: "#A87BE0" },
+  { key: "conditionnel", label: "Conditionnel", color: "#E06B6B" },
+  { key: "subjonctif", label: "Subjonctif", color: "#C9A84C" },
+];
+
+const BASE_VERBS = [
+  // -ER verbs
+  { infinitive:"parler", meaning:"to speak", type:"regular -ER", tenses:{ présent:["parle","parles","parle","parlons","parlez","parlent"], passé_composé:["ai parlé","as parlé","a parlé","avons parlé","avez parlé","ont parlé"], imparfait:["parlais","parlais","parlait","parlions","parliez","parlaient"], futur:["parlerai","parleras","parlera","parlerons","parlerez","parleront"], conditionnel:["parlerais","parlerais","parlerait","parlerions","parleriez","parleraient"], subjonctif:["parle","parles","parle","parlions","parliez","parlent"] }},
+  { infinitive:"manger", meaning:"to eat", type:"regular -ER", tenses:{ présent:["mange","manges","mange","mangeons","mangez","mangent"], passé_composé:["ai mangé","as mangé","a mangé","avons mangé","avez mangé","ont mangé"], imparfait:["mangeais","mangeais","mangeait","mangions","mangiez","mangeaient"], futur:["mangerai","mangeras","mangera","mangerons","mangerez","mangeront"], conditionnel:["mangerais","mangerais","mangerait","mangerions","mangeriez","mangeraient"], subjonctif:["mange","manges","mange","mangions","mangiez","mangent"] }},
+  { infinitive:"travailler", meaning:"to work", type:"regular -ER", tenses:{ présent:["travaille","travailles","travaille","travaillons","travaillez","travaillent"], passé_composé:["ai travaillé","as travaillé","a travaillé","avons travaillé","avez travaillé","ont travaillé"], imparfait:["travaillais","travaillais","travaillait","travaillions","travailliez","travaillaient"], futur:["travaillerai","travailleras","travaillera","travaillerons","travaillerez","travailleront"], conditionnel:["travaillerais","travaillerais","travaillerait","travaillerions","travailleriez","travailleraient"], subjonctif:["travaille","travailles","travaille","travaillions","travailliez","travaillent"] }},
+  { infinitive:"aimer", meaning:"to love / like", type:"regular -ER", tenses:{ présent:["aime","aimes","aime","aimons","aimez","aiment"], passé_composé:["ai aimé","as aimé","a aimé","avons aimé","avez aimé","ont aimé"], imparfait:["aimais","aimais","aimait","aimions","aimiez","aimaient"], futur:["aimerai","aimeras","aimera","aimerons","aimerez","aimeront"], conditionnel:["aimerais","aimerais","aimerait","aimerions","aimeriez","aimeraient"], subjonctif:["aime","aimes","aime","aimions","aimiez","aiment"] }},
+  { infinitive:"habiter", meaning:"to live / reside", type:"regular -ER", tenses:{ présent:["habite","habites","habite","habitons","habitez","habitent"], passé_composé:["ai habité","as habité","a habité","avons habité","avez habité","ont habité"], imparfait:["habitais","habitais","habitait","habitions","habitiez","habitaient"], futur:["habiterai","habiteras","habitera","habiterons","habiterez","habiteront"], conditionnel:["habiterais","habiterais","habiterait","habiterions","habiteriez","habiteraient"], subjonctif:["habite","habites","habite","habitions","habitiez","habitent"] }},
+  { infinitive:"chercher", meaning:"to look for", type:"regular -ER", tenses:{ présent:["cherche","cherches","cherche","cherchons","cherchez","cherchent"], passé_composé:["ai cherché","as cherché","a cherché","avons cherché","avez cherché","ont cherché"], imparfait:["cherchais","cherchais","cherchait","cherchions","cherchiez","cherchaient"], futur:["chercherai","chercheras","cherchera","chercherons","chercherez","chercheront"], conditionnel:["chercherais","chercherais","chercherait","chercherions","chercheriez","chercheraient"], subjonctif:["cherche","cherches","cherche","cherchions","cherchiez","cherchent"] }},
+  { infinitive:"penser", meaning:"to think", type:"regular -ER", tenses:{ présent:["pense","penses","pense","pensons","pensez","pensent"], passé_composé:["ai pensé","as pensé","a pensé","avons pensé","avez pensé","ont pensé"], imparfait:["pensais","pensais","pensait","pensions","pensiez","pensaient"], futur:["penserai","penseras","pensera","penserons","penserez","penseront"], conditionnel:["penserais","penserais","penserait","penserions","penseriez","penseraient"], subjonctif:["pense","penses","pense","pensions","pensiez","pensent"] }},
+  { infinitive:"regarder", meaning:"to watch / look", type:"regular -ER", tenses:{ présent:["regarde","regardes","regarde","regardons","regardez","regardent"], passé_composé:["ai regardé","as regardé","a regardé","avons regardé","avez regardé","ont regardé"], imparfait:["regardais","regardais","regardait","regardions","regardiez","regardaient"], futur:["regarderai","regarderas","regardera","regarderons","regarderez","regarderont"], conditionnel:["regarderais","regarderais","regarderait","regarderions","regarderiez","regarderaient"], subjonctif:["regarde","regardes","regarde","regardions","regardiez","regardent"] }},
+  { infinitive:"écouter", meaning:"to listen", type:"regular -ER", tenses:{ présent:["écoute","écoutes","écoute","écoutons","écoutez","écoutent"], passé_composé:["ai écouté","as écouté","a écouté","avons écouté","avez écouté","ont écouté"], imparfait:["écoutais","écoutais","écoutait","écoutions","écoutiez","écoutaient"], futur:["écouterai","écouteras","écoutera","écouterons","écouterez","écouteront"], conditionnel:["écouterais","écouterais","écouterait","écouterions","écouteriez","écouteraient"], subjonctif:["écoute","écoutes","écoute","écoutions","écoutiez","écoutent"] }},
+  { infinitive:"donner", meaning:"to give", type:"regular -ER", tenses:{ présent:["donne","donnes","donne","donnons","donnez","donnent"], passé_composé:["ai donné","as donné","a donné","avons donné","avez donné","ont donné"], imparfait:["donnais","donnais","donnait","donnions","donniez","donnaient"], futur:["donnerai","donneras","donnera","donnerons","donnerez","donneront"], conditionnel:["donnerais","donnerais","donnerait","donnerions","donneriez","donneraient"], subjonctif:["donne","donnes","donne","donnions","donniez","donnent"] }},
+  { infinitive:"arriver", meaning:"to arrive", type:"regular -ER", tenses:{ présent:["arrive","arrives","arrive","arrivons","arrivez","arrivent"], passé_composé:["suis arrivé(e)","es arrivé(e)","est arrivé(e)","sommes arrivé(e)s","êtes arrivé(e)s","sont arrivé(e)s"], imparfait:["arrivais","arrivais","arrivait","arrivions","arriviez","arrivaient"], futur:["arriverai","arriveras","arrivera","arriverons","arriverez","arriveront"], conditionnel:["arriverais","arriverais","arriverait","arriverions","arriveriez","arriveraient"], subjonctif:["arrive","arrives","arrive","arrivions","arriviez","arrivent"] }},
+
+  // -IR verbs
+  { infinitive:"finir", meaning:"to finish", type:"regular -IR", tenses:{ présent:["finis","finis","finit","finissons","finissez","finissent"], passé_composé:["ai fini","as fini","a fini","avons fini","avez fini","ont fini"], imparfait:["finissais","finissais","finissait","finissions","finissiez","finissaient"], futur:["finirai","finiras","finira","finirons","finirez","finiront"], conditionnel:["finirais","finirais","finirait","finirions","finiriez","finiraient"], subjonctif:["finisse","finisses","finisse","finissions","finissiez","finissent"] }},
+  { infinitive:"choisir", meaning:"to choose", type:"regular -IR", tenses:{ présent:["choisis","choisis","choisit","choisissons","choisissez","choisissent"], passé_composé:["ai choisi","as choisi","a choisi","avons choisi","avez choisi","ont choisi"], imparfait:["choisissais","choisissais","choisissait","choisissions","choisissiez","choisissaient"], futur:["choisirai","choisiras","choisira","choisirons","choisirez","choisiront"], conditionnel:["choisirais","choisirais","choisirait","choisirions","choisiriez","choisiraient"], subjonctif:["choisisse","choisisses","choisisse","choisissions","choisissiez","choisissent"] }},
+  { infinitive:"réussir", meaning:"to succeed", type:"regular -IR", tenses:{ présent:["réussis","réussis","réussit","réussissons","réussissez","réussissent"], passé_composé:["ai réussi","as réussi","a réussi","avons réussi","avez réussi","ont réussi"], imparfait:["réussissais","réussissais","réussissait","réussissions","réussissiez","réussissaient"], futur:["réussirai","réussiras","réussira","réussirons","réussirez","réussiront"], conditionnel:["réussirais","réussirais","réussirait","réussirions","réussiriez","réussiraient"], subjonctif:["réussisse","réussisses","réussisse","réussissions","réussissiez","réussissent"] }},
+  { infinitive:"obéir", meaning:"to obey", type:"regular -IR", tenses:{ présent:["obéis","obéis","obéit","obéissons","obéissez","obéissent"], passé_composé:["ai obéi","as obéi","a obéi","avons obéi","avez obéi","ont obéi"], imparfait:["obéissais","obéissais","obéissait","obéissions","obéissiez","obéissaient"], futur:["obéirai","obéiras","obéira","obéirons","obéirez","obéiront"], conditionnel:["obéirais","obéirais","obéirait","obéirions","obéiriez","obéiraient"], subjonctif:["obéisse","obéisses","obéisse","obéissions","obéissiez","obéissent"] }},
+
+  // -RE verbs
+  { infinitive:"vendre", meaning:"to sell", type:"regular -RE", tenses:{ présent:["vends","vends","vend","vendons","vendez","vendent"], passé_composé:["ai vendu","as vendu","a vendu","avons vendu","avez vendu","ont vendu"], imparfait:["vendais","vendais","vendait","vendions","vendiez","vendaient"], futur:["vendrai","vendras","vendra","vendrons","vendrez","vendront"], conditionnel:["vendrais","vendrais","vendrait","vendrions","vendriez","vendraient"], subjonctif:["vende","vendes","vende","vendions","vendiez","vendent"] }},
+  { infinitive:"attendre", meaning:"to wait", type:"regular -RE", tenses:{ présent:["attends","attends","attend","attendons","attendez","attendent"], passé_composé:["ai attendu","as attendu","a attendu","avons attendu","avez attendu","ont attendu"], imparfait:["attendais","attendais","attendait","attendions","attendiez","attendaient"], futur:["attendrai","attendras","attendra","attendrons","attendrez","attendront"], conditionnel:["attendrais","attendrais","attendrait","attendrions","attendriez","attendraient"], subjonctif:["attende","attendes","attende","attendions","attendiez","attendent"] }},
+  { infinitive:"entendre", meaning:"to hear", type:"regular -RE", tenses:{ présent:["entends","entends","entend","entendons","entendez","entendent"], passé_composé:["ai entendu","as entendu","a entendu","avons entendu","avez entendu","ont entendu"], imparfait:["entendais","entendais","entendait","entendions","entendiez","entendaient"], futur:["entendrai","entendras","entendra","entendrons","entendrez","entendront"], conditionnel:["entendrais","entendrais","entendrait","entendrions","entendriez","entendraient"], subjonctif:["entende","entendes","entende","entendions","entendiez","entendent"] }},
+
+  // Irregular
+  // ── VERIFIED against Bescherelle / Lawless French / Kwiziq ──
+  { infinitive:"être", meaning:"to be", type:"irregular", tenses:{
+      présent:       ["suis","es","est","sommes","êtes","sont"],
+      passé_composé: ["ai été","as été","a été","avons été","avez été","ont été"],
+      imparfait:     ["étais","étais","était","étions","étiez","étaient"],
+      futur:         ["serai","seras","sera","serons","serez","seront"],
+      conditionnel:  ["serais","serais","serait","serions","seriez","seraient"],
+      subjonctif:    ["sois","sois","soit","soyons","soyez","soient"] }},   // irregular stems soi-/soy-
+
+  { infinitive:"avoir", meaning:"to have", type:"irregular", tenses:{
+      présent:       ["ai","as","a","avons","avez","ont"],
+      passé_composé: ["ai eu","as eu","a eu","avons eu","avez eu","ont eu"],
+      imparfait:     ["avais","avais","avait","avions","aviez","avaient"],
+      futur:         ["aurai","auras","aura","aurons","aurez","auront"],
+      conditionnel:  ["aurais","aurais","aurait","aurions","auriez","auraient"],
+      subjonctif:    ["aie","aies","ait","ayons","ayez","aient"] }},        // irregular stems ai-/ay-
+
+  { infinitive:"aller", meaning:"to go", type:"irregular", tenses:{
+      présent:       ["vais","vas","va","allons","allez","vont"],
+      passé_composé: ["suis allé(e)","es allé(e)","est allé(e)","sommes allé(e)s","êtes allé(e)s","sont allé(e)s"],
+      imparfait:     ["allais","allais","allait","allions","alliez","allaient"],
+      futur:         ["irai","iras","ira","irons","irez","iront"],
+      conditionnel:  ["irais","irais","irait","irions","iriez","iraient"],
+      subjonctif:    ["aille","ailles","aille","allions","alliez","aillent"] }}, // stems aill-/all-
+
+  { infinitive:"faire", meaning:"to do / make", type:"irregular", tenses:{
+      présent:       ["fais","fais","fait","faisons","faites","font"],
+      passé_composé: ["ai fait","as fait","a fait","avons fait","avez fait","ont fait"],
+      imparfait:     ["faisais","faisais","faisait","faisions","faisiez","faisaient"],
+      futur:         ["ferai","feras","fera","ferons","ferez","feront"],
+      conditionnel:  ["ferais","ferais","ferait","ferions","feriez","feraient"],
+      subjonctif:    ["fasse","fasses","fasse","fassions","fassiez","fassent"] }}, // stem fass-
+
+  { infinitive:"pouvoir", meaning:"to be able to", type:"irregular", tenses:{
+      présent:       ["peux","peux","peut","pouvons","pouvez","peuvent"],
+      passé_composé: ["ai pu","as pu","a pu","avons pu","avez pu","ont pu"],
+      imparfait:     ["pouvais","pouvais","pouvait","pouvions","pouviez","pouvaient"],
+      futur:         ["pourrai","pourras","pourra","pourrons","pourrez","pourront"],
+      conditionnel:  ["pourrais","pourrais","pourrait","pourrions","pourriez","pourraient"],
+      subjonctif:    ["puisse","puisses","puisse","puissions","puissiez","puissent"] }}, // stem puiss-
+
+  { infinitive:"vouloir", meaning:"to want", type:"irregular", tenses:{
+      présent:       ["veux","veux","veut","voulons","voulez","veulent"],
+      passé_composé: ["ai voulu","as voulu","a voulu","avons voulu","avez voulu","ont voulu"],
+      imparfait:     ["voulais","voulais","voulait","voulions","vouliez","voulaient"],
+      futur:         ["voudrai","voudras","voudra","voudrons","voudrez","voudront"],
+      conditionnel:  ["voudrais","voudrais","voudrait","voudrions","voudriez","voudraient"],
+      subjonctif:    ["veuille","veuilles","veuille","voulions","vouliez","veuillent"] }}, // stems veuill-/voul-
+
+  { infinitive:"savoir", meaning:"to know (fact)", type:"irregular", tenses:{
+      présent:       ["sais","sais","sait","savons","savez","savent"],
+      passé_composé: ["ai su","as su","a su","avons su","avez su","ont su"],
+      imparfait:     ["savais","savais","savait","savions","saviez","savaient"],
+      futur:         ["saurai","sauras","saura","saurons","saurez","sauront"],
+      conditionnel:  ["saurais","saurais","saurait","saurions","sauriez","sauraient"],
+      subjonctif:    ["sache","saches","sache","sachions","sachiez","sachent"] }}, // stem sach-
+
+  { infinitive:"venir", meaning:"to come", type:"irregular", tenses:{
+      présent:       ["viens","viens","vient","venons","venez","viennent"],
+      passé_composé: ["suis venu(e)","es venu(e)","est venu(e)","sommes venu(e)s","êtes venu(e)s","sont venu(e)s"],
+      imparfait:     ["venais","venais","venait","venions","veniez","venaient"],
+      futur:         ["viendrai","viendras","viendra","viendrons","viendrez","viendront"],
+      conditionnel:  ["viendrais","viendrais","viendrait","viendrions","viendriez","viendraient"],
+      subjonctif:    ["vienne","viennes","vienne","venions","veniez","viennent"] }}, // stems vienn-/ven-
+
+  { infinitive:"prendre", meaning:"to take", type:"irregular", tenses:{
+      présent:       ["prends","prends","prend","prenons","prenez","prennent"],
+      passé_composé: ["ai pris","as pris","a pris","avons pris","avez pris","ont pris"],
+      imparfait:     ["prenais","prenais","prenait","prenions","preniez","prenaient"],
+      futur:         ["prendrai","prendras","prendra","prendrons","prendrez","prendront"],
+      conditionnel:  ["prendrais","prendrais","prendrait","prendrions","prendriez","prendraient"],
+      subjonctif:    ["prenne","prennes","prenne","prenions","preniez","prennent"] }}, // stems prenn-/pren-
+
+  { infinitive:"dire", meaning:"to say / tell", type:"irregular", tenses:{
+      présent:       ["dis","dis","dit","disons","dites","disent"],
+      passé_composé: ["ai dit","as dit","a dit","avons dit","avez dit","ont dit"],
+      imparfait:     ["disais","disais","disait","disions","disiez","disaient"],
+      futur:         ["dirai","diras","dira","dirons","direz","diront"],
+      conditionnel:  ["dirais","dirais","dirait","dirions","diriez","diraient"],
+      subjonctif:    ["dise","dises","dise","disions","disiez","disent"] }}, // stem dis-
+
+  { infinitive:"voir", meaning:"to see", type:"irregular", tenses:{
+      présent:       ["vois","vois","voit","voyons","voyez","voient"],
+      passé_composé: ["ai vu","as vu","a vu","avons vu","avez vu","ont vu"],
+      imparfait:     ["voyais","voyais","voyait","voyions","voyiez","voyaient"],
+      futur:         ["verrai","verras","verra","verrons","verrez","verront"],
+      conditionnel:  ["verrais","verrais","verrait","verrions","verriez","verraient"],
+      subjonctif:    ["voie","voies","voie","voyions","voyiez","voient"] }}, // stems voi-/voy-
+
+  { infinitive:"devoir", meaning:"to have to / must", type:"irregular", tenses:{
+      présent:       ["dois","dois","doit","devons","devez","doivent"],
+      passé_composé: ["ai dû","as dû","a dû","avons dû","avez dû","ont dû"],
+      imparfait:     ["devais","devais","devait","devions","deviez","devaient"],
+      futur:         ["devrai","devras","devra","devrons","devrez","devront"],
+      conditionnel:  ["devrais","devrais","devrait","devrions","devriez","devraient"],
+      subjonctif:    ["doive","doives","doive","devions","deviez","doivent"] }}, // stems doiv-/dev-
+
+  { infinitive:"mettre", meaning:"to put / place", type:"irregular", tenses:{
+      présent:       ["mets","mets","met","mettons","mettez","mettent"],
+      passé_composé: ["ai mis","as mis","a mis","avons mis","avez mis","ont mis"],
+      imparfait:     ["mettais","mettais","mettait","mettions","mettiez","mettaient"],
+      futur:         ["mettrai","mettras","mettra","mettrons","mettrez","mettront"],
+      conditionnel:  ["mettrais","mettrais","mettrait","mettrions","mettriez","mettraient"],
+      subjonctif:    ["mette","mettes","mette","mettions","mettiez","mettent"] }}, // stem mett-
+
+  { infinitive:"partir", meaning:"to leave", type:"irregular", tenses:{
+      présent:       ["pars","pars","part","partons","partez","partent"],
+      passé_composé: ["suis parti(e)","es parti(e)","est parti(e)","sommes parti(e)s","êtes parti(e)s","sont parti(e)s"],
+      imparfait:     ["partais","partais","partait","partions","partiez","partaient"],
+      futur:         ["partirai","partiras","partira","partirons","partirez","partiront"],
+      conditionnel:  ["partirais","partirais","partirait","partirions","partiriez","partiraient"],
+      subjonctif:    ["parte","partes","parte","partions","partiez","partent"] }}, // stem part-
+
+  { infinitive:"lire", meaning:"to read", type:"irregular", tenses:{
+      présent:       ["lis","lis","lit","lisons","lisez","lisent"],
+      passé_composé: ["ai lu","as lu","a lu","avons lu","avez lu","ont lu"],
+      imparfait:     ["lisais","lisais","lisait","lisions","lisiez","lisaient"],
+      futur:         ["lirai","liras","lira","lirons","lirez","liront"],
+      conditionnel:  ["lirais","lirais","lirait","lirions","liriez","liraient"],
+      subjonctif:    ["lise","lises","lise","lisions","lisiez","lisent"] }}, // stem lis-
+
+  { infinitive:"écrire", meaning:"to write", type:"irregular", tenses:{
+      présent:       ["écris","écris","écrit","écrivons","écrivez","écrivent"],
+      passé_composé: ["ai écrit","as écrit","a écrit","avons écrit","avez écrit","ont écrit"],
+      imparfait:     ["écrivais","écrivais","écrivait","écrivions","écriviez","écrivaient"],
+      futur:         ["écrirai","écriras","écrira","écrirons","écrirez","écriront"],
+      conditionnel:  ["écrirais","écrirais","écrirait","écririons","écririez","écriraient"],
+      subjonctif:    ["écrive","écrives","écrive","écrivions","écriviez","écrivent"] }}, // stem écriv-
+];
+
+// State
+let verbs = [...BASE_VERBS];
+let customVerbs = JSON.parse(localStorage.getItem('customVerbs') || '[]');
+verbs = [...BASE_VERBS, ...customVerbs];
+
+let selectedVerb = verbs[0];
+let selectedTense = "présent";
+let currentMode = "table";
+let currentFilter = "all";
+let flashIdx = 0;
+let flashFlipped = false;
+let quizQ = null;
+let quizInput_val = "";
+let quizScore = { correct: 0, total: 0 };
+let quizAnswered = false;
+
+function getBadgeClass(type) {
+  if (type === "regular -ER") return "badge-er";
+  if (type === "regular -IR") return "badge-ir";
+  if (type === "regular -RE") return "badge-re";
+  if (type === "custom") return "badge-custom";
+  return "badge-irr";
+}
+
+function getBadgeLabel(type) {
+  if (type === "regular -ER") return "-ER";
+  if (type === "regular -IR") return "-IR";
+  if (type === "regular -RE") return "-RE";
+  if (type === "irregular") return "IRR";
+  if (type === "custom") return "MY";
+  return type;
+}
+
+function getTenseColor(key) {
+  return TENSES.find(t => t.key === key)?.color || "#C9A84C";
+}
+
+// Render sidebar
+function renderSidebar() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const list = document.getElementById('verbList');
+
+  const filtered = verbs.filter(v => {
+    const matchSearch = v.infinitive.toLowerCase().includes(search) || v.meaning.toLowerCase().includes(search);
+    const matchFilter = currentFilter === 'all' ||
+      (currentFilter === '-ER' && v.type === 'regular -ER') ||
+      (currentFilter === '-IR' && v.type === 'regular -IR') ||
+      (currentFilter === '-RE' && v.type === 'regular -RE') ||
+      (currentFilter === 'irregular' && v.type === 'irregular') ||
+      (currentFilter === 'custom' && v.type === 'custom');
+    return matchSearch && matchFilter;
+  });
+
+  document.getElementById('verbCountBadge').textContent = `${verbs.length} verbs`;
+
+  list.innerHTML = filtered.map((v, i) => `
+    <div class="verb-item ${selectedVerb.infinitive === v.infinitive ? 'active' : ''}" onclick="selectVerb('${v.infinitive}')">
+      <div class="verb-item-left">
+        <span class="verb-item-name">${v.infinitive}</span>
+        <span class="verb-item-meaning">${v.meaning}</span>
+      </div>
+      <span class="verb-type-badge ${getBadgeClass(v.type)}">${getBadgeLabel(v.type)}</span>
+    </div>
+  `).join('');
+}
+
+function selectVerb(infinitive) {
+  selectedVerb = verbs.find(v => v.infinitive === infinitive);
+  flashIdx = 0; flashFlipped = false;
+  document.getElementById('heroVerb').textContent = selectedVerb.infinitive;
+  document.getElementById('heroMeaning').textContent = selectedVerb.meaning;
+  renderSidebar();
+  renderContent();
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderSidebar();
+}
+
+function filterVerbs() { renderSidebar(); }
+
+// Render tense bar
+function renderTenseBar() {
+  const bar = document.getElementById('tenseBar');
+  bar.innerHTML = TENSES.map(t => `
+    <button class="tense-btn ${selectedTense === t.key ? 'active' : ''}"
+      onclick="setTense('${t.key}')"
+      style="${selectedTense === t.key ? `color:${t.color};border-bottom-color:${t.color}` : ''}">
+      ${t.label}
+    </button>
+  `).join('');
+
+  // Hide tense bar in some modes
+  bar.style.display = (currentMode === 'quiz' || currentMode === 'all') ? 'none' : 'flex';
+}
+
+function setTense(t) {
+  selectedTense = t;
+  flashIdx = 0; flashFlipped = false;
+  renderTenseBar();
+  renderContent();
+}
+
+function setMode(m, el) {
+  currentMode = m;
+  document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  flashIdx = 0; flashFlipped = false;
+  if (m === 'quiz') { generateQuiz(); }
+  renderTenseBar();
+  renderContent();
+}
+
+// === RENDER CONTENT ===
+function renderContent() {
+  const area = document.getElementById('contentArea');
+  if (currentMode === 'table') renderTable(area);
+  else if (currentMode === 'all') renderAllTenses(area);
+  else if (currentMode === 'flash') renderFlashcard(area);
+  else if (currentMode === 'quiz') renderQuiz(area);
+}
+
+function renderTable(area) {
+  const forms = selectedVerb.tenses[selectedTense];
+  const color = getTenseColor(selectedTense);
+  area.innerHTML = `
+    <div class="conj-grid">
+      ${PRONOUNS.map((p, i) => `
+        <div class="conj-card">
+          <div>
+            <div class="conj-pronoun">${p}</div>
+            <div class="conj-form">${forms[i]}</div>
+          </div>
+          <div style="width:3px;height:40px;background:${color}33;border-radius:2px;"></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderAllTenses(area) {
+  area.innerHTML = `
+    <div class="all-tenses-grid">
+      ${TENSES.map((t, ti) => `
+        <div class="tense-block" style="animation-delay:${ti * 0.06}s">
+          <div class="tense-block-header">
+            <div class="tense-dot" style="background:${t.color}"></div>
+            <span class="tense-block-title">${t.label}</span>
+          </div>
+          <div class="tense-block-rows">
+            ${PRONOUNS.map((p, i) => `
+              <div class="tense-block-row">
+                <span class="tbr-pronoun">${p}</span>
+                <span class="tbr-form">${selectedVerb.tenses[t.key][i]}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderFlashcard(area) {
+  const forms = selectedVerb.tenses[selectedTense];
+  const color = getTenseColor(selectedTense);
+  const total = PRONOUNS.length;
+
+  area.innerHTML = `
+    <div class="flashcard-wrap">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-label">
+          <span>${selectedVerb.infinitive} · ${TENSES.find(t=>t.key===selectedTense)?.label}</span>
+          <span>${flashIdx + 1} / ${total}</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" style="width:${((flashIdx+1)/total)*100}%;background:${color}"></div>
+        </div>
+      </div>
+
+      <div class="flashcard ${flashFlipped ? 'flipped' : ''}" onclick="flipCard()" style="${flashFlipped ? `border-color:${color}55` : ''}">
+        ${!flashFlipped ? `
+          <div class="fc-hint">Conjugate in ${TENSES.find(t=>t.key===selectedTense)?.label}</div>
+          <div class="fc-pronoun">${PRONOUNS[flashIdx]}</div>
+          <div class="fc-main" style="color:${color}">${selectedVerb.infinitive}</div>
+          <div class="fc-tense" style="margin-top:20px;color:#7A7670;font-size:12px;">tap to reveal →</div>
+        ` : `
+          <div class="fc-hint" style="color:${color}">Answer</div>
+          <div class="fc-pronoun">${PRONOUNS[flashIdx]}</div>
+          <div class="fc-main">${forms[flashIdx]}</div>
+          <div class="fc-tense">${selectedVerb.meaning}</div>
+        `}
+      </div>
+
+      <div class="fc-nav">
+        <button class="fc-btn" onclick="prevCard()">←</button>
+        <button class="fc-btn" onclick="flipCard()" style="flex:2;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;color:${color};">
+          ${flashFlipped ? 'Hide' : 'Reveal'}
+        </button>
+        <button class="fc-btn" onclick="nextCard()">→</button>
+      </div>
+
+      <div class="fc-dots">
+        ${PRONOUNS.map((_, i) => `
+          <div class="fc-dot ${i === flashIdx ? 'active' : ''}"
+            style="${i === flashIdx ? `background:${color}` : ''}"
+            onclick="goToCard(${i})"></div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function flipCard() { flashFlipped = !flashFlipped; renderContent(); }
+function prevCard() { flashIdx = Math.max(0, flashIdx - 1); flashFlipped = false; renderContent(); }
+function nextCard() { flashIdx = (flashIdx + 1) % PRONOUNS.length; flashFlipped = false; renderContent(); }
+function goToCard(i) { flashIdx = i; flashFlipped = false; renderContent(); }
+
+function generateQuiz() {
+  const verb = verbs[Math.floor(Math.random() * verbs.length)];
+  const tense = TENSES[Math.floor(Math.random() * TENSES.length)];
+  const pIdx = Math.floor(Math.random() * 6);
+  quizQ = { verb, tense, pIdx, answer: verb.tenses[tense.key][pIdx] };
+  quizAnswered = false;
+  renderContent();
+}
+
+function renderQuiz(area) {
+  if (!quizQ) return;
+  const color = quizQ.tense.color;
+
+  area.innerHTML = `
+    <div class="quiz-wrap">
+      <div class="quiz-score-bar">
+        <div class="score-stat">
+          <span class="score-num" style="color:var(--green)">${quizScore.correct}</span>
+          <span class="score-label">Correct</span>
+        </div>
+        <div class="score-divider"></div>
+        <div class="score-stat">
+          <span class="score-num" style="color:var(--red)">${quizScore.total - quizScore.correct}</span>
+          <span class="score-label">Wrong</span>
+        </div>
+        <div class="score-divider"></div>
+        <div class="score-stat">
+          <span class="score-num">${quizScore.total}</span>
+          <span class="score-label">Total</span>
+        </div>
+        ${quizScore.total > 0 ? `
+        <div class="score-divider"></div>
+        <div class="score-stat">
+          <span class="score-num" style="color:${color}">${Math.round(quizScore.correct/quizScore.total*100)}%</span>
+          <span class="score-label">Accuracy</span>
+        </div>` : ''}
+      </div>
+
+      <div class="quiz-card">
+        <div class="quiz-meta">
+          <span class="quiz-badge" style="background:${color}22;color:${color}">${quizQ.tense.label}</span>
+          <span class="quiz-badge" style="background:${quizQ.verb.type==='irregular'?'#E09B5C22':'#5DB88722'};color:${quizQ.verb.type==='irregular'?'var(--orange)':'var(--green)'}">
+            ${quizQ.verb.type}
+          </span>
+        </div>
+        <div class="quiz-prompt">Conjugate in ${quizQ.tense.label}:</div>
+        <div class="quiz-question">
+          <span class="quiz-pronoun">${PRONOUNS[quizQ.pIdx]}</span>
+          <span class="quiz-verb-q">${quizQ.verb.infinitive}</span>
+        </div>
+        <div class="quiz-sub">${quizQ.verb.meaning}</div>
+
+        <input class="quiz-input ${quizAnswered ? (document.getElementById('quizInp')?.classList.contains('correct') ? 'correct' : 'wrong') : ''}"
+          id="quizInp"
+          placeholder="Type the conjugation..."
+          value="${quizAnswered ? document.getElementById('quizInp')?.value || '' : ''}"
+          onkeydown="if(event.key==='Enter'&&!${quizAnswered})checkQuiz()"
+          ${quizAnswered ? 'disabled' : ''}>
+
+        <div class="quiz-feedback ${quizAnswered ? 'show' : ''} ${document.getElementById('quizFb')?.classList.contains('correct') ? 'correct' : 'wrong'}" id="quizFb"></div>
+
+        <div class="quiz-actions">
+          ${!quizAnswered
+            ? `<button class="btn-primary" onclick="checkQuiz()">Check Answer</button>`
+            : `<button class="btn-primary" onclick="generateQuiz()">Next Question →</button>
+               <button class="btn-secondary" onclick="resetScore()">Reset Score</button>`
+          }
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (quizAnswered) {
+    const inp = document.getElementById('quizInp');
+    const fb = document.getElementById('quizFb');
+    // These will be re-set by checkQuiz
+  }
+}
+
+function checkQuiz() {
+  const inp = document.getElementById('quizInp');
+  const fb = document.getElementById('quizFb');
+  if (!inp || !quizQ || quizAnswered) return;
+  const val = inp.value.trim();
+  if (!val) return;
+  const correct = val.toLowerCase() === quizQ.answer.toLowerCase();
+  quizScore.correct += correct ? 1 : 0;
+  quizScore.total++;
+  quizAnswered = true;
+
+  inp.classList.add(correct ? 'correct' : 'wrong');
+  inp.disabled = true;
+
+  fb.classList.add('show', correct ? 'correct' : 'wrong');
+  fb.innerHTML = correct
+    ? `✓ Correct! Well done.`
+    : `✗ The correct answer is: <strong style="font-family:'DM Mono',monospace">${quizQ.answer}</strong>`;
+
+  // Replace button
+  const actions = document.querySelector('.quiz-actions');
+  actions.innerHTML = `
+    <button class="btn-primary" onclick="generateQuiz()">Next Question →</button>
+    <button class="btn-secondary" onclick="resetScore()">Reset Score</button>
+  `;
+}
+
+function resetScore() { quizScore = { correct: 0, total: 0 }; generateQuiz(); }
+
+// === MODAL ===
+function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+function addCustomVerb() {
+  const inf = document.getElementById('mInfinitive').value.trim();
+  const meaning = document.getElementById('mMeaning').value.trim();
+  const type = document.getElementById('mType').value;
+  if (!inf || !meaning) return alert('Please fill in infinitive and meaning.');
+
+  // Build present tense only (others blank-filled)
+  const present = [0,1,2,3,4,5].map(i => document.getElementById(`p${i}`).value.trim() || `[${PRONOUNS[i]}]`);
+
+  const newVerb = {
+    infinitive: inf, meaning, type: 'custom',
+    tenses: {
+      présent: present,
+      passé_composé: present.map(f => `[${f}]`),
+      imparfait: present.map(f => `[${f}]`),
+      futur: present.map(f => `[${f}]`),
+      conditionnel: present.map(f => `[${f}]`),
+      subjonctif: present.map(f => `[${f}]`),
+    }
+  };
+
+  customVerbs.push(newVerb);
+  localStorage.setItem('customVerbs', JSON.stringify(customVerbs));
+  verbs = [...BASE_VERBS, ...customVerbs];
+  closeModal();
+  selectVerb(inf);
+}
+
+// === INIT ===
+function init() {
+  renderTenseBar();
+  renderSidebar();
+  renderContent();
+}
+
+init();
+</script>
+</body>
+</html>
