@@ -689,6 +689,103 @@
   .ai-backend-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
 
 
+
+  /* === A1 PRESENT TENSE CHEAT SHEET === */
+  .cheatsheet-wrap{
+    max-width:1100px;
+    margin:0 auto 40px;
+    display:grid;
+    gap:20px;
+  }
+  .cheatsheet-card{
+    background:linear-gradient(180deg,var(--surface),var(--surface2));
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:26px;
+    box-shadow:0 14px 34px var(--shadow);
+  }
+  .cheatsheet-title{
+    font-family:'Playfair Display',serif;
+    font-size:34px;
+    font-weight:900;
+    margin-bottom:8px;
+  }
+  .cheatsheet-sub{
+    color:var(--muted);
+    font-size:14px;
+    margin-bottom:22px;
+  }
+  .cheatsheet-section{ margin-bottom:26px; }
+  .cheatsheet-section:last-child{ margin-bottom:0; }
+  .cheatsheet-h{
+    font-size:18px;
+    font-weight:800;
+    margin-bottom:12px;
+    color:var(--accent);
+  }
+  .cheatsheet-table-wrap{ overflow-x:auto; border-radius:14px; }
+  .cheatsheet-table{
+    width:100%;
+    border-collapse:collapse;
+    overflow:hidden;
+    border-radius:14px;
+    margin-top:14px;
+    border:1px solid var(--border);
+    min-width:620px;
+  }
+  .cheatsheet-table th{
+    background:var(--surface3);
+    color:var(--accent);
+    padding:12px;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    text-align:left;
+    white-space:nowrap;
+  }
+  .cheatsheet-table td{
+    padding:12px;
+    border-top:1px solid var(--border);
+    font-size:14px;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .cheatsheet-note{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:12px;
+    background:#C9A84C14;
+    border:1px solid #C9A84C40;
+    color:var(--accent2);
+    font-size:14px;
+    line-height:1.6;
+  }
+  .cheatsheet-code{
+    font-family:'DM Mono',monospace;
+    color:var(--accent);
+  }
+  .cheatsheet-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:16px;
+  }
+  .cheatsheet-mini{
+    border:1px solid var(--border);
+    background:var(--surface2);
+    border-radius:16px;
+    padding:18px;
+  }
+  .cheatsheet-mini h4{
+    margin-bottom:10px;
+    color:var(--accent);
+    font-size:15px;
+  }
+  .cheatsheet-mini p{
+    line-height:1.7;
+    font-size:14px;
+    color:var(--text);
+  }
+
 </style>
 </head>
 <body class="owner-locked">
@@ -750,6 +847,7 @@
           <button class="mode-tab" onclick="setMode('all', this)">All Tenses</button>
           <button class="mode-tab" onclick="setMode('flash', this)">Flashcard</button>
           <button class="mode-tab" onclick="setMode('quiz', this)">Quiz</button>
+          <button class="mode-tab" onclick="setMode('a1', this)">A1 Present</button>
         </div>
       </div>
     </div>
@@ -69284,7 +69382,7 @@ function renderTenseBar() {
   `).join('');
 
   // Hide tense bar in some modes
-  bar.style.display = (currentMode === 'quiz' || currentMode === 'all') ? 'none' : 'flex';
+  bar.style.display = (currentMode === 'quiz' || currentMode === 'all' || currentMode === 'a1') ? 'none' : 'flex';
 }
 
 function setTense(t) {
@@ -69305,12 +69403,125 @@ function setMode(m, el) {
 }
 
 // === RENDER CONTENT ===
+
+function renderA1PresentCheatSheet(area) {
+  area.innerHTML = `
+    <div class="cheatsheet-wrap">
+      <div class="cheatsheet-card">
+        <div class="cheatsheet-title">A1 French Present Tense</div>
+        <div class="cheatsheet-sub">Complete beginner cheat sheet for present tense conjugation.</div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">1. Regular -ER Verbs</div>
+          <div class="cheatsheet-table-wrap"><table class="cheatsheet-table">
+            <tr><th>je</th><th>tu</th><th>il</th><th>nous</th><th>vous</th><th>ils</th></tr>
+            <tr><td>e</td><td>es</td><td>e</td><td>ons</td><td>ez</td><td>ent</td></tr>
+          </table></div>
+          <div class="cheatsheet-note"><span class="cheatsheet-code">-ER → e, es, e, ons, ez, ent</span><br><br>Example: parler → parle, parlons</div>
+        </div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">2. Regular -IR Verbs — “issons” Family</div>
+          <div class="cheatsheet-table-wrap"><table class="cheatsheet-table">
+            <tr><th>je</th><th>tu</th><th>il</th><th>nous</th><th>vous</th><th>ils</th></tr>
+            <tr><td>is</td><td>is</td><td>it</td><td>issons</td><td>issez</td><td>issent</td></tr>
+          </table></div>
+          <div class="cheatsheet-note"><span class="cheatsheet-code">-IR → is, is, it, issons, issez, issent</span><br><br>Example: finir → finis, finissons<br><br>➡️ If you see “issons” = regular -IR</div>
+        </div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">3. Regular -RE Verbs</div>
+          <div class="cheatsheet-table-wrap"><table class="cheatsheet-table">
+            <tr><th>je</th><th>tu</th><th>il</th><th>nous</th><th>vous</th><th>ils</th></tr>
+            <tr><td>s</td><td>s</td><td>—</td><td>ons</td><td>ez</td><td>ent</td></tr>
+          </table></div>
+          <div class="cheatsheet-note"><span class="cheatsheet-code">-RE → s, s, —, ons, ez, ent</span><br><br>Example: vendre → vends, vendons</div>
+        </div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">4. -ER Spelling Changes — Still Regular</div>
+          <div class="cheatsheet-table-wrap"><table class="cheatsheet-table">
+            <tr><th>Pattern</th><th>Example</th></tr>
+            <tr><td>é → è</td><td>préférer → préfère</td></tr>
+            <tr><td>e → è</td><td>acheter → achète</td></tr>
+            <tr><td>double consonant</td><td>appeler → appelle</td></tr>
+            <tr><td>-ger</td><td>mangeons</td></tr>
+            <tr><td>-cer</td><td>commençons</td></tr>
+          </table></div>
+          <div class="cheatsheet-note">➡️ Endings NEVER change.</div>
+        </div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">5. Complete A1 Core Irregular Verbs</div>
+          <div class="cheatsheet-table-wrap"><table class="cheatsheet-table">
+            <tr><th>Verb</th><th>je</th><th>tu</th><th>il/elle</th><th>nous</th><th>vous</th><th>ils/elles</th></tr>
+            <tr><td>être</td><td>suis</td><td>es</td><td>est</td><td>sommes</td><td>êtes</td><td>sont</td></tr>
+            <tr><td>avoir</td><td>ai</td><td>as</td><td>a</td><td>avons</td><td>avez</td><td>ont</td></tr>
+            <tr><td>aller</td><td>vais</td><td>vas</td><td>va</td><td>allons</td><td>allez</td><td>vont</td></tr>
+            <tr><td>faire</td><td>fais</td><td>fais</td><td>fait</td><td>faisons</td><td>faites</td><td>font</td></tr>
+            <tr><td>venir</td><td>viens</td><td>viens</td><td>vient</td><td>venons</td><td>venez</td><td>viennent</td></tr>
+            <tr><td>pouvoir</td><td>peux</td><td>peux</td><td>peut</td><td>pouvons</td><td>pouvez</td><td>peuvent</td></tr>
+            <tr><td>vouloir</td><td>veux</td><td>veux</td><td>veut</td><td>voulons</td><td>voulez</td><td>veulent</td></tr>
+            <tr><td>devoir</td><td>dois</td><td>dois</td><td>doit</td><td>devons</td><td>devez</td><td>doivent</td></tr>
+            <tr><td>prendre</td><td>prends</td><td>prends</td><td>prend</td><td>prenons</td><td>prenez</td><td>prennent</td></tr>
+            <tr><td>boire</td><td>bois</td><td>bois</td><td>boit</td><td>buvons</td><td>buvez</td><td>boivent</td></tr>
+            <tr><td>dire</td><td>dis</td><td>dis</td><td>dit</td><td>disons</td><td>dites</td><td>disent</td></tr>
+            <tr><td>voir</td><td>vois</td><td>vois</td><td>voit</td><td>voyons</td><td>voyez</td><td>voient</td></tr>
+            <tr><td>savoir</td><td>sais</td><td>sais</td><td>sait</td><td>savons</td><td>savez</td><td>savent</td></tr>
+            <tr><td>connaître</td><td>connais</td><td>connais</td><td>connaît</td><td>connaissons</td><td>connaissez</td><td>connaissent</td></tr>
+            <tr><td>mettre</td><td>mets</td><td>mets</td><td>met</td><td>mettons</td><td>mettez</td><td>mettent</td></tr>
+            <tr><td>sortir</td><td>sors</td><td>sors</td><td>sort</td><td>sortons</td><td>sortez</td><td>sortent</td></tr>
+            <tr><td>dormir</td><td>dors</td><td>dors</td><td>dort</td><td>dormons</td><td>dormez</td><td>dorment</td></tr>
+            <tr><td>partir</td><td>pars</td><td>pars</td><td>part</td><td>partons</td><td>partez</td><td>partent</td></tr>
+          </table></div>
+        </div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">6. Golden Rule</div>
+          <div class="cheatsheet-note">After a conjugated verb → second verb stays infinitive.<br><br>Je veux manger<br>Je vais travailler<br>Je peux parler</div>
+        </div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">7. Negation</div>
+          <div class="cheatsheet-note"><span class="cheatsheet-code">ne + verb + pas</span><br><br>Je ne parle pas<br>Je n’aime pas</div>
+        </div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">8. Questions</div>
+          <div class="cheatsheet-table-wrap"><table class="cheatsheet-table">
+            <tr><th>Structure</th><th>Example</th></tr>
+            <tr><td>statement intonation</td><td>Tu viens ?</td></tr>
+            <tr><td>est-ce que</td><td>Est-ce que tu viens ?</td></tr>
+          </table></div>
+        </div>
+
+        <div class="cheatsheet-section">
+          <div class="cheatsheet-h">9. Reflexive Verbs</div>
+          <div class="cheatsheet-table-wrap"><table class="cheatsheet-table">
+            <tr><th>Structure</th><th>Example</th></tr>
+            <tr><td>me + verb</td><td>Je me lave</td></tr>
+            <tr><td>te + verb</td><td>Tu te réveilles</td></tr>
+            <tr><td>se + verb</td><td>Il se couche</td></tr>
+          </table></div>
+        </div>
+
+        <div class="cheatsheet-grid">
+          <div class="cheatsheet-mini"><h4>10. Easy Recognition Trick</h4><p>-er → regular ER<br>issons → regular IR<br>s/s/— → regular RE<br>weird stem → irregular</p></div>
+          <div class="cheatsheet-mini"><h4>11. Core Sentence Formula</h4><p>Subject + verb<br>Subject + verb + object<br>Subject + verb + infinitive<br>Negation<br>Question</p></div>
+          <div class="cheatsheet-mini"><h4>12. A1 Mental Model</h4><p>-ER = biggest group<br>-IR = “issons”<br>-RE = s/s/—<br>irregular = memorize common ones only</p></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderContent() {
   const area = document.getElementById('contentArea');
   if (currentMode === 'table') renderTable(area);
   else if (currentMode === 'all') renderAllTenses(area);
   else if (currentMode === 'flash') renderFlashcard(area);
   else if (currentMode === 'quiz') renderQuiz(area);
+  else if (currentMode === 'a1') renderA1PresentCheatSheet(area);
 }
 
 function renderTable(area) {
